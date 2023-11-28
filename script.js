@@ -47,7 +47,27 @@ let generateScales = () => {
 }
 
 let drawBars = () => {
-
+    svg.selectAll('rect')
+        .data(values)
+        .enter()
+        .append('rect')
+        .attr('class', 'bar')
+        .attr('width', (width - (2 * padding)) / values.length)
+        .attr('data-date', (item) => {
+            return item[0]
+        })
+        .attr('data-gdp', (item) => {
+            return item[1]
+        })
+        .attr('height', (item) => {
+            return heightScale(item[1])
+        })
+        .attr('x', (item, index) => {
+            return xScale(index)
+        })
+        .attr('y', (item) => {
+            return (height - padding) - heightScale(item[1])
+        })
 }
 
 let generateAxis = () => {
