@@ -4,7 +4,7 @@ const req = new XMLHttpRequest();
 let data
 let values
 
-let heighScale
+let heightScale
 let xScale
 let xAxisScale
 let yAxisScale
@@ -21,7 +21,29 @@ let drawCanvas = () => {
 }
 
 let generateScales = () => {
+    heightScale = d3.scaleLinear()
+                    .domain([0,d3.max(values, (item) => {
+                        return item[1]
+                    })])
+                    .range([0, height - (2*padding)])
 
+    xScale = d3.scaleLinear()
+                    .domain([0, values.length -1])
+                    .range([padding, width - padding])
+
+    let datesArray = values.map((item) => {
+        return new Date(item[0])
+    })
+
+    xAxisScale = d3.scaleTime()
+                    .domain([d3.min(datesArray), d3.max(datesArray)])
+                    .range([padding, width - padding])
+
+    yAxisScale = d3.scaleLinear()
+                    .domain([0, d3.max(values, (item) => {
+                        return item[1]
+                    })])
+                    .range([height - padding, padding ])
 }
 
 let drawBars = () => {
@@ -29,17 +51,28 @@ let drawBars = () => {
 }
 
 let generateAxis = () => {
+    let xAxis = d3.axisBottom(xAxisScale)
+    let yAxis = d3.axisLeft(yAxisScale)
+                    
+    svg.append('g')
+        .call(xAxis)
+        .attr('id', 'x-axis')
+        .attr('transform', 'translate(0, ' + (height-padding) + ')')
 
+    svg.append('g')
+    .call(yAxis)
+    .attr('id', 'y-axis')
+    .attr('transform', 'translate(' + padding + ', 0)')
 }
 
 req.open('GET', url, true)
 req.onload = () => {
     data = JSON.parse(req.responseText);
     values = data.data
-    console.log(values);
-    drawCanvas();
-    generateScales();
-    drawBars();
-    generateAxis();
+    console.log(values)
+    drawCanvas()
+    generateScales()
+    drawBars()
+    generateAxis()
 }
-req.send();
+req.send()
